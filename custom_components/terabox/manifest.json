@@ -1,0 +1,13 @@
+{
+  "domain": "terabox",
+  "name": "Terabox",
+  "after_dependencies": ["backup"],
+  "codeowners": ["@devbis"],
+  "config_flow": true,
+  "dependencies": ["application_credentials"],
+  "documentation": "https://github.com/devbis/hass-terabox",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "requirements": ["aioterabox", "aiofiles>=22.1.0"],
+  "version": "1.0.0"
+}
