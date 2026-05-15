@@ -9,7 +9,6 @@ from dataclasses import dataclass
 from typing import Any
 
 import aiofiles
-from aiohttp import ClientSession
 from aiohttp import ClientResponse
 from aiohttp.client_exceptions import ClientError, ClientResponseError
 from aioterabox.api import TeraboxClient as TeraboxApiClient
@@ -26,6 +25,7 @@ from homeassistant.exceptions import (
     ConfigEntryNotReady,
     HomeAssistantError,
 )
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import CONF_BACKUP_LOCATION
 
@@ -73,7 +73,7 @@ class TeraboxClient:
         self._email = email
         self._password = password
         self._initial_cookies = cookies
-        self._session = ClientSession()
+        self._session = async_get_clientsession(hass)
         self._api = TeraboxApiClient(
             email=self._email,
             password=self._password,
@@ -82,9 +82,8 @@ class TeraboxClient:
         )
 
     async def async_close(self) -> None:
-        """Close the dedicated HTTP session."""
-        if not self._session.closed:
-            await self._session.close()
+        """Compatibility hook for callers that expect an async close method."""
+        return None
 
     @property
     def email(self) -> str:
