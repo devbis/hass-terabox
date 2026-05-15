@@ -7,11 +7,7 @@
         "data": {
           "email": "Email",
           "password": "Password",
-          "backup_location": "Backup folder",
-          "jstoken": "JS token",
-          "csrfToken": "CSRF token",
-          "browserid": "Browser ID",
-          "ndus": "NDUS"
+          "backup_location": "Backup folder"
         }
       }
     },

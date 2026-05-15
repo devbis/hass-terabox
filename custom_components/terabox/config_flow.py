@@ -17,10 +17,6 @@ from homeassistant.helpers.selector import (
 from . import TeraboxClient
 from .const import (
     CONF_BACKUP_LOCATION,
-    CONF_BROWSERID,
-    CONF_CSRF_TOKEN,
-    CONF_JSTOKEN,
-    CONF_NDUS,
     DOMAIN,
 )
 
@@ -31,22 +27,6 @@ DATA_SCHEMA = vol.Schema(
             config=TextSelectorConfig(type=TextSelectorType.PASSWORD)
         ),
         vol.Optional(CONF_BACKUP_LOCATION): str,
-
-        vol.Optional(CONF_JSTOKEN): TextSelector(
-            config=TextSelectorConfig(type=TextSelectorType.TEXT)
-        ),
-        vol.Optional(CONF_CSRF_TOKEN): str,
-        vol.Optional(CONF_BROWSERID): str,
-        vol.Optional(CONF_NDUS): str,
-    }
-)
-
-OPTIONS_SCHEMA = vol.Schema(
-    {
-        vol.Optional(CONF_JSTOKEN): str,
-        vol.Optional(CONF_CSRF_TOKEN): str,
-        vol.Optional(CONF_BROWSERID): str,
-        vol.Optional(CONF_NDUS): str,
     }
 )
 
@@ -94,20 +74,12 @@ class TeraboxFlowHandler(ConfigFlow, domain=DOMAIN):
         # )
 
         errors: dict[str, str] = {}
-        cookies: dict[str, str] | None = {
-            CONF_JSTOKEN: user_input.get(CONF_JSTOKEN, ""),
-            CONF_CSRF_TOKEN: user_input.get(CONF_CSRF_TOKEN, ""),
-            CONF_BROWSERID: user_input.get(CONF_BROWSERID, ""),
-            CONF_NDUS: user_input.get(CONF_NDUS, ""),
-        }
-        if not all(bool(value) for value in cookies.values()):
-            cookies = None
 
         terabox_client = TeraboxClient(
             self.hass,
             email=user_input[CONF_EMAIL],
             password=user_input[CONF_PASSWORD],
-            cookies=cookies,
+            cookies=None,
         )
         try:
             try:
