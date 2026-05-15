@@ -17,6 +17,7 @@ from homeassistant.helpers.selector import (
 from . import TeraboxClient
 from .const import (
     CONF_BACKUP_LOCATION,
+    DEFAULT_BACKUP_LOCATION,
     DOMAIN,
 )
 
@@ -26,7 +27,7 @@ DATA_SCHEMA = vol.Schema(
         vol.Required(CONF_PASSWORD): TextSelector(
             config=TextSelectorConfig(type=TextSelectorType.PASSWORD)
         ),
-        vol.Optional(CONF_BACKUP_LOCATION): str,
+        vol.Optional(CONF_BACKUP_LOCATION, default=DEFAULT_BACKUP_LOCATION): str,
     }
 )
 
@@ -96,7 +97,7 @@ class TeraboxFlowHandler(ConfigFlow, domain=DOMAIN):
                     data={
                         CONF_EMAIL: user_input[CONF_EMAIL],
                         CONF_PASSWORD: user_input[CONF_PASSWORD],
-                        CONF_BACKUP_LOCATION: user_input.get(CONF_BACKUP_LOCATION, ""),
+                        CONF_BACKUP_LOCATION: user_input.get(CONF_BACKUP_LOCATION, DEFAULT_BACKUP_LOCATION),
                     },
                     options=dict(terabox_client._api._cookies),
                 )

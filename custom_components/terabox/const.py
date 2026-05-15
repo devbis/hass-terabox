@@ -8,7 +8,7 @@ from typing import Final
 DOMAIN = "terabox"
 
 SCAN_INTERVAL = timedelta(hours=6)
-DRIVE_FOLDER_PREFIX = "hass_backup"
+DEFAULT_BACKUP_LOCATION = "hass_backup"
 
 STORAGE_KEY = "terraform_cookies"
 STORAGE_VERSION = 1
