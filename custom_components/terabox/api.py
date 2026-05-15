@@ -9,10 +9,15 @@ from dataclasses import dataclass
 from typing import Any
 
 import aiofiles
+from aiohttp import ClientSession
 from aiohttp import ClientResponse
 from aiohttp.client_exceptions import ClientError, ClientResponseError
 from aioterabox.api import TeraboxClient as TeraboxApiClient
-from aioterabox.exceptions import TeraboxApiError, TeraboxNotFoundError
+from aioterabox.exceptions import (
+    TeraboxApiError,
+    TeraboxNotFoundError,
+    TeraboxUnauthorizedError,
+)
 from homeassistant.components.backup import AgentBackup, suggested_filename
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -21,7 +26,6 @@ from homeassistant.exceptions import (
     ConfigEntryNotReady,
     HomeAssistantError,
 )
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import CONF_BACKUP_LOCATION
 
@@ -69,13 +73,18 @@ class TeraboxClient:
         self._email = email
         self._password = password
         self._initial_cookies = cookies
-        self._session = async_get_clientsession(hass)
+        self._session = ClientSession()
         self._api = TeraboxApiClient(
             email=self._email,
             password=self._password,
             session=self._session,
             cookies=cookies,
         )
+
+    async def async_close(self) -> None:
+        """Close the dedicated HTTP session."""
+        if not self._session.closed:
+            await self._session.close()
 
     @property
     def email(self) -> str:
@@ -101,6 +110,12 @@ class TeraboxClient:
         try:
             await self._api.login()
             await self._api.get_account_id()
+        except TeraboxUnauthorizedError as err:
+            if "system error" in str(err).lower():
+                raise ConfigEntryNotReady("Unable to connect to Terabox") from err
+            raise ConfigEntryAuthFailed("Invalid authentication") from err
+        except TeraboxApiError as err:
+            raise ConfigEntryNotReady("Unable to connect to Terabox") from err
         except ClientResponseError as err:
             if err.status == 401:
                 raise ConfigEntryAuthFailed("Invalid authentication") from err

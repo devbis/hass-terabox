@@ -70,5 +70,6 @@ async def async_unload_entry(
 ) -> bool:
     """Unload a config entry."""
     await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    await entry.runtime_data.client.async_close()
 
     return True

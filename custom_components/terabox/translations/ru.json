@@ -1,4 +1,25 @@
 {
+    "config": {
+        "step": {
+            "user": {
+                "title": "Подключение TeraBox",
+                "description": "Войдите в свою учетную запись TeraBox.",
+                "data": {
+                    "email": "Email",
+                    "password": "Пароль",
+                    "backup_location": "Папка для резервных копий",
+                    "jstoken": "JS token",
+                    "csrfToken": "CSRF token",
+                    "browserid": "Browser ID",
+                    "ndus": "NDUS"
+                }
+            }
+        },
+        "error": {
+            "invalid_auth": "Неверные учетные данные",
+            "cannot_connect": "Не удалось подключиться к TeraBox"
+        }
+    },
     "entity": {
         "sensor": {
             "backups_size": {

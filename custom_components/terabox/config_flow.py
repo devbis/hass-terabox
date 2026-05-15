@@ -79,6 +79,13 @@ class TeraboxFlowHandler(ConfigFlow, domain=DOMAIN):
                 step_id="user", data_schema=DATA_SCHEMA
             )
 
+        if user_input[CONF_EMAIL] == "" or user_input[CONF_PASSWORD] == "":
+            return self.async_show_form(
+                step_id="user",
+                data_schema=DATA_SCHEMA,
+                errors={"base": "invalid_auth"},
+            )
+
         # self._async_abort_entries_match(
         #     {
         #         CONF_EMAIL: user_input[CONF_EMAIL],
@@ -103,26 +110,26 @@ class TeraboxFlowHandler(ConfigFlow, domain=DOMAIN):
             cookies=cookies,
         )
         try:
-            await terabox_client.login()
-        except (ConfigEntryNotReady, ConfigEntryAuthFailed):
-            errors["base"] = "invalid_auth"
-        else:
-            unique_id = f'terabox_{terabox_client.account_id}'
-            await self.async_set_unique_id(unique_id)
-
-            # _LOGGER.debug("Creating an entry for %s", device_info["name"])
-        if user_input[CONF_EMAIL] == "" or user_input[CONF_PASSWORD] == "":
-            errors["base"] = "invalid_auth"
-        else:
-            return self.async_create_entry(
-                title=terabox_client.account_id,
-                data={
-                    CONF_EMAIL: user_input[CONF_EMAIL],
-                    CONF_PASSWORD: user_input[CONF_PASSWORD],
-                    CONF_BACKUP_LOCATION: user_input.get(CONF_BACKUP_LOCATION, ""),
-                },
-                options=cookies,
-            )
+            try:
+                await terabox_client.login()
+            except ConfigEntryAuthFailed:
+                errors["base"] = "invalid_auth"
+            except ConfigEntryNotReady:
+                errors["base"] = "cannot_connect"
+            else:
+                unique_id = f'terabox_{terabox_client.account_id}'
+                await self.async_set_unique_id(unique_id)
+                return self.async_create_entry(
+                    title=terabox_client.account_id,
+                    data={
+                        CONF_EMAIL: user_input[CONF_EMAIL],
+                        CONF_PASSWORD: user_input[CONF_PASSWORD],
+                        CONF_BACKUP_LOCATION: user_input.get(CONF_BACKUP_LOCATION, ""),
+                    },
+                    options=dict(terabox_client._api._cookies),
+                )
+        finally:
+            await terabox_client.async_close()
 
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors

@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect TeraBox",
+        "description": "Sign in to your TeraBox account.",
+        "data": {
+          "email": "Email",
+          "password": "Password",
+          "backup_location": "Backup folder",
+          "jstoken": "JS token",
+          "csrfToken": "CSRF token",
+          "browserid": "Browser ID",
+          "ndus": "NDUS"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid authentication",
+      "cannot_connect": "Unable to connect to TeraBox"
+    }
+  }
+}
